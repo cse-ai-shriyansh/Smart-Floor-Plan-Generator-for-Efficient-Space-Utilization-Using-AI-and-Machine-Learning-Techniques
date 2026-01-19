@@ -1,0 +1,127 @@
+.hero {
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 60px 20px;
+  position: relative;
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: -1px;
+}
+
+.heroTagline {
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-weight: 400;
+  margin-bottom: 50px;
+  max-width: 700px;
+  opacity: 0.8;
+}
+
+.geometricDesign {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  opacity: 0.05;
+}
+
+.geometricDesign svg {
+  width: 600px;
+  height: 600px;
+}
+
+.section {
+  padding: 80px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sectionAlt {
+  background-color: var(--color-gray-light);
+}
+
+.sectionTitle {
+  font-size: clamp(2rem, 4vw, 3rem);
+  text-align: center;
+  margin-bottom: 60px;
+  font-weight: 600;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.card {
+  border: 2px solid var(--color-black);
+  padding: 40px 30px;
+  text-align: center;
+  transition: var(--transition-smooth);
+  background-color: var(--color-white);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 10px 10px 0 var(--color-black);
+}
+
+.cardIcon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.cardTitle {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.cardText {
+  font-size: 1rem;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+.ctaSection {
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.ctaText {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  margin-bottom: 40px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    min-height: 80vh;
+    padding: 40px 20px;
+  }
+  
+  .section {
+    padding: 60px 20px;
+  }
+  
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .geometricDesign svg {
+    width: 400px;
+    height: 400px;
+  }
+}
