@@ -1,0 +1,220 @@
+.container {
+  min-height: 100vh;
+  padding: 80px 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 80px;
+  padding-bottom: 40px;
+  border-bottom: 2px solid var(--color-black);
+}
+
+.title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  opacity: 0.7;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+.content {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.section {
+  margin-bottom: 80px;
+}
+
+.sectionTitle {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 600;
+  margin-bottom: 30px;
+  position: relative;
+  padding-left: 20px;
+}
+
+.sectionTitle::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 100%;
+  background-color: var(--color-black);
+}
+
+.sectionContent {
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  line-height: 1.9;
+  opacity: 0.85;
+  margin-bottom: 25px;
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.featureCard {
+  border: 2px solid var(--color-black);
+  padding: 30px;
+  transition: var(--transition-smooth);
+}
+
+.featureCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 8px 8px 0 var(--color-black);
+}
+
+.featureIcon {
+  font-size: 2rem;
+  margin-bottom: 15px;
+}
+
+.featureTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.featureDescription {
+  font-size: 1rem;
+  line-height: 1.7;
+  opacity: 0.8;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+.listItem {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 15px;
+  padding-left: 30px;
+  position: relative;
+}
+
+.listItem::before {
+  content: '▪';
+  position: absolute;
+  left: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.audienceList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.audienceItem {
+  border: 2px solid var(--color-black);
+  padding: 20px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.impactSection {
+  background-color: var(--color-gray-light);
+  padding: 60px 40px;
+  margin: 80px -20px;
+}
+
+.impactGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.impactCard {
+  background-color: var(--color-white);
+  border: 2px solid var(--color-black);
+  padding: 35px;
+}
+
+.impactCardTitle {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.impactCardContent {
+  font-size: 1rem;
+  line-height: 1.8;
+  opacity: 0.85;
+}
+
+.visionBox {
+  border: 3px solid var(--color-black);
+  padding: 50px;
+  text-align: center;
+  margin: 60px 0;
+  background-color: var(--color-white);
+}
+
+.visionText {
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  line-height: 1.8;
+  font-style: italic;
+  opacity: 0.9;
+}
+
+.ctaSection {
+  text-align: center;
+  padding: 60px 20px;
+  margin-top: 80px;
+}
+
+.ctaText {
+  font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+  margin-bottom: 30px;
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 60px 15px;
+  }
+  
+  .header {
+    margin-bottom: 60px;
+  }
+  
+  .section {
+    margin-bottom: 60px;
+  }
+  
+  .featureGrid,
+  .audienceList,
+  .impactGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .impactSection {
+    padding: 40px 20px;
+    margin: 60px -15px;
+  }
+  
+  .visionBox {
+    padding: 30px 20px;
+  }
+}

@@ -6,19 +6,21 @@ export default function Header() {
     <header className={styles.header}>
       <div className={styles.headerContent}>
         <Link href="/" className={styles.logo}>
-          Fleet Dashboard
+          Smart Floor Plan Generator
         </Link>
         <nav className={styles.nav}>
           <Link href="/" className={styles.navLink}>
-            Dashboard
+            Home
           </Link>
-          <Link href="/orders" className={styles.navLink}>
-            Orders
+          <Link href="/about" className={styles.navLink}>
+            About
           </Link>
-          <div className={styles.liveIndicator}>
-            <div className={styles.liveDot}></div>
-            <span>Live</span>
-          </div>
+          <Link href="/tutorial" className={styles.navLink}>
+            Tutorial
+          </Link>
+          <Link href="/app" className={styles.navLink}>
+            Generate
+          </Link>
         </nav>
       </div>
     </header>

@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import Image from 'next/image';
 import styles from '@/styles/Home.module.css';
 
 export default function Home() {
@@ -32,6 +33,15 @@ export default function Home() {
           </div>
           
           <h1 className={styles.heroTitle}>Smart Floor Plan Generator</h1>
+          <div className={styles.logoContainer}>
+            <Image 
+              src="/images.svg" 
+              alt="Smart Floor Plan Generator Logo" 
+              width={200} 
+              height={200}
+              priority
+            />
+          </div>
           <p className={styles.heroTagline}>
             AI-powered floor plan generation using deep learning for efficient space utilization
           </p>

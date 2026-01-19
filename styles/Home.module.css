@@ -12,8 +12,19 @@
 .heroTitle {
   font-size: clamp(2.5rem, 6vw, 5rem);
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   letter-spacing: -1px;
+}
+
+.logoContainer {
+  margin: 30px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logoContainer img {
+  filter: grayscale(100%) contrast(100%);
 }
 
 .heroTagline {
