@@ -85,7 +85,7 @@ export default function About() {
 
           {/* Who It's For */}
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Who It's For</h2>
+            <h2 className={styles.sectionTitle}>Who It&apos;s For</h2>
             <div className={styles.audienceList}>
               <div className={styles.audienceItem}>
                 Students exploring AI in architecture
