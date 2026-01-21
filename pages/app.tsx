@@ -3,28 +3,28 @@ import Head from 'next/head';
 import styles from '@/styles/App.module.css';
 
 interface FormData {
-  plotWidth: string;
-  plotHeight: string;
-  numRooms: string;
+  width: string;
+  depth: string;
   bedrooms: string;
-  bathrooms: string;
-  kitchen: boolean;
-  livingRoom: boolean;
-  diningRoom: boolean;
-  studyRoom: boolean;
+  drawingRoom: string;
+  kitchen: string;
+  toilet: string;
+  parking: string;
+  porch: string;
+  veranda: string;
 }
 
 export default function App() {
   const [formData, setFormData] = useState<FormData>({
-    plotWidth: '',
-    plotHeight: '',
-    numRooms: '',
+    width: '',
+    depth: '',
     bedrooms: '',
-    bathrooms: '',
-    kitchen: true,
-    livingRoom: true,
-    diningRoom: false,
-    studyRoom: false,
+    drawingRoom: '',
+    kitchen: '',
+    toilet: '',
+    parking: '',
+    porch: '',
+    veranda: '',
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -61,25 +61,18 @@ export default function App() {
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
 
-    // Plot Width validation
-    if (!formData.plotWidth) {
-      newErrors.plotWidth = 'Plot width is required';
-    } else if (parseFloat(formData.plotWidth) <= 0) {
-      newErrors.plotWidth = 'Plot width must be greater than 0';
+    // Width validation
+    if (!formData.width) {
+      newErrors.width = 'Width is required';
+    } else if (parseFloat(formData.width) <= 0) {
+      newErrors.width = 'Width must be greater than 0';
     }
 
-    // Plot Height validation
-    if (!formData.plotHeight) {
-      newErrors.plotHeight = 'Plot height is required';
-    } else if (parseFloat(formData.plotHeight) <= 0) {
-      newErrors.plotHeight = 'Plot height must be greater than 0';
-    }
-
-    // Number of Rooms validation
-    if (!formData.numRooms) {
-      newErrors.numRooms = 'Number of rooms is required';
-    } else if (parseInt(formData.numRooms) < 1 || parseInt(formData.numRooms) > 10) {
-      newErrors.numRooms = 'Number of rooms must be between 1 and 10';
+    // Depth validation
+    if (!formData.depth) {
+      newErrors.depth = 'Depth is required';
+    } else if (parseFloat(formData.depth) <= 0) {
+      newErrors.depth = 'Depth must be greater than 0';
     }
 
     // Bedrooms validation
@@ -89,11 +82,25 @@ export default function App() {
       newErrors.bedrooms = 'Number of bedrooms cannot be negative';
     }
 
-    // Bathrooms validation
-    if (!formData.bathrooms) {
-      newErrors.bathrooms = 'Number of bathrooms is required';
-    } else if (parseInt(formData.bathrooms) < 1) {
-      newErrors.bathrooms = 'At least one bathroom is required';
+    // Drawing room validation
+    if (!formData.drawingRoom) {
+      newErrors.drawingRoom = 'Number of drawing rooms is required';
+    } else if (parseInt(formData.drawingRoom) < 0) {
+      newErrors.drawingRoom = 'Number of drawing rooms cannot be negative';
+    }
+
+    // Kitchen validation
+    if (!formData.kitchen) {
+      newErrors.kitchen = 'Number of kitchens is required';
+    } else if (parseInt(formData.kitchen) < 0) {
+      newErrors.kitchen = 'Number of kitchens cannot be negative';
+    }
+
+    // Toilet validation
+    if (!formData.toilet) {
+      newErrors.toilet = 'Number of toilets is required';
+    } else if (parseInt(formData.toilet) < 1) {
+      newErrors.toilet = 'At least one toilet is required';
     }
 
     setErrors(newErrors);
@@ -136,15 +143,15 @@ export default function App() {
 
   const handleReset = () => {
     setFormData({
-      plotWidth: '',
-      plotHeight: '',
-      numRooms: '',
+      width: '',
+      depth: '',
       bedrooms: '',
-      bathrooms: '',
-      kitchen: true,
-      livingRoom: true,
-      diningRoom: false,
-      studyRoom: false,
+      drawingRoom: '',
+      kitchen: '',
+      toilet: '',
+      parking: '',
+      porch: '',
+      veranda: '',
     });
     setErrors({});
     setFloorPlan(null);
@@ -178,156 +185,145 @@ export default function App() {
             <form onSubmit={handleGenerate}>
               {/* Plot Dimensions */}
               <div className={styles.formGroup}>
-                <label className={styles.label}>Plot Dimensions (meters)</label>
+                <label className={styles.label}>Plot Dimensions (feet)</label>
                 <div className={styles.inputGroup}>
                   <div>
                     <input
                       type="number"
-                      name="plotWidth"
+                      name="width"
                       className={styles.input}
                       placeholder="Width"
-                      value={formData.plotWidth}
+                      value={formData.width}
                       onChange={handleChange}
                       step="0.1"
                       min="0"
                     />
-                    {errors.plotWidth && (
-                      <div className={styles.errorMessage}>{errors.plotWidth}</div>
+                    {errors.width && (
+                      <div className={styles.errorMessage}>{errors.width}</div>
                     )}
                   </div>
                   <div>
                     <input
                       type="number"
-                      name="plotHeight"
+                      name="depth"
                       className={styles.input}
-                      placeholder="Height"
-                      value={formData.plotHeight}
+                      placeholder="Depth"
+                      value={formData.depth}
                       onChange={handleChange}
                       step="0.1"
                       min="0"
                     />
-                    {errors.plotHeight && (
-                      <div className={styles.errorMessage}>{errors.plotHeight}</div>
+                    {errors.depth && (
+                      <div className={styles.errorMessage}>{errors.depth}</div>
                     )}
                   </div>
                 </div>
-                <p className={styles.helpText}>Enter width and height of your plot</p>
-              </div>
-
-              {/* Number of Rooms */}
-              <div className={styles.formGroup}>
-                <label htmlFor="numRooms" className={styles.label}>
-                  Total Number of Rooms
-                </label>
-                <input
-                  type="number"
-                  id="numRooms"
-                  name="numRooms"
-                  className={styles.input}
-                  placeholder="e.g., 5"
-                  value={formData.numRooms}
-                  onChange={handleChange}
-                  min="1"
-                  max="10"
-                />
-                {errors.numRooms && (
-                  <div className={styles.errorMessage}>{errors.numRooms}</div>
-                )}
-                <p className={styles.helpText}>Select between 1-10 rooms</p>
+                <p className={styles.helpText}>Enter width and depth of your plot in feet</p>
               </div>
 
               {/* Room Specifications */}
               <div className={styles.formGroup}>
-                <label className={styles.label}>Room Specifications</label>
+                <label className={styles.label}>Number of Bedrooms</label>
+                <input
+                  type="number"
+                  name="bedrooms"
+                  className={styles.input}
+                  placeholder="e.g., 3"
+                  value={formData.bedrooms}
+                  onChange={handleChange}
+                  min="0"
+                />
+                {errors.bedrooms && (
+                  <div className={styles.errorMessage}>{errors.bedrooms}</div>
+                )}
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Number of Drawing Room / Living Room</label>
+                <input
+                  type="number"
+                  name="drawingRoom"
+                  className={styles.input}
+                  placeholder="e.g., 1"
+                  value={formData.drawingRoom}
+                  onChange={handleChange}
+                  min="0"
+                />
+                {errors.drawingRoom && (
+                  <div className={styles.errorMessage}>{errors.drawingRoom}</div>
+                )}
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Number of Kitchen</label>
+                <input
+                  type="number"
+                  name="kitchen"
+                  className={styles.input}
+                  placeholder="e.g., 1"
+                  value={formData.kitchen}
+                  onChange={handleChange}
+                  min="0"
+                />
+                {errors.kitchen && (
+                  <div className={styles.errorMessage}>{errors.kitchen}</div>
+                )}
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Number of Toilet</label>
+                <input
+                  type="number"
+                  name="toilet"
+                  className={styles.input}
+                  placeholder="e.g., 2"
+                  value={formData.toilet}
+                  onChange={handleChange}
+                  min="1"
+                />
+                {errors.toilet && (
+                  <div className={styles.errorMessage}>{errors.toilet}</div>
+                )}
+              </div>
+
+              {/* Additional Spaces */}
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Additional Spaces (Optional)</label>
                 <div className={styles.inputGroup}>
                   <div>
                     <input
                       type="number"
-                      name="bedrooms"
+                      name="parking"
                       className={styles.input}
-                      placeholder="Bedrooms"
-                      value={formData.bedrooms}
+                      placeholder="Parking"
+                      value={formData.parking}
                       onChange={handleChange}
                       min="0"
                     />
-                    {errors.bedrooms && (
-                      <div className={styles.errorMessage}>{errors.bedrooms}</div>
-                    )}
                   </div>
                   <div>
                     <input
                       type="number"
-                      name="bathrooms"
+                      name="porch"
                       className={styles.input}
-                      placeholder="Bathrooms"
-                      value={formData.bathrooms}
+                      placeholder="Porch"
+                      value={formData.porch}
                       onChange={handleChange}
-                      min="1"
+                      min="0"
                     />
-                    {errors.bathrooms && (
-                      <div className={styles.errorMessage}>{errors.bathrooms}</div>
-                    )}
                   </div>
                 </div>
-              </div>
-
-              {/* Room Preferences */}
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Additional Rooms</label>
-                <div className={styles.roomPreferences}>
-                  <div className={styles.checkboxGroup}>
-                    <input
-                      type="checkbox"
-                      id="kitchen"
-                      name="kitchen"
-                      className={styles.checkbox}
-                      checked={formData.kitchen}
-                      onChange={handleChange}
-                    />
-                    <label htmlFor="kitchen" className={styles.checkboxLabel}>
-                      Kitchen
-                    </label>
-                  </div>
-                  <div className={styles.checkboxGroup}>
-                    <input
-                      type="checkbox"
-                      id="livingRoom"
-                      name="livingRoom"
-                      className={styles.checkbox}
-                      checked={formData.livingRoom}
-                      onChange={handleChange}
-                    />
-                    <label htmlFor="livingRoom" className={styles.checkboxLabel}>
-                      Living Room
-                    </label>
-                  </div>
-                  <div className={styles.checkboxGroup}>
-                    <input
-                      type="checkbox"
-                      id="diningRoom"
-                      name="diningRoom"
-                      className={styles.checkbox}
-                      checked={formData.diningRoom}
-                      onChange={handleChange}
-                    />
-                    <label htmlFor="diningRoom" className={styles.checkboxLabel}>
-                      Dining Room
-                    </label>
-                  </div>
-                  <div className={styles.checkboxGroup}>
-                    <input
-                      type="checkbox"
-                      id="studyRoom"
-                      name="studyRoom"
-                      className={styles.checkbox}
-                      checked={formData.studyRoom}
-                      onChange={handleChange}
-                    />
-                    <label htmlFor="studyRoom" className={styles.checkboxLabel}>
-                      Study Room
-                    </label>
-                  </div>
-                </div>
+                <input
+                  type="number"
+                  name="veranda"
+                  className={styles.input}
+                  placeholder="Veranda"
+                  value={formData.veranda}
+                  onChange={handleChange}
+                  min="0"
+                  style={{ marginTop: '15px' }}
+                />
+                <p className={styles.helpText}>Add parking, porch, or veranda spaces</p>
               </div>
 
               {/* Buttons */}
@@ -397,7 +393,7 @@ export default function App() {
                         Floor Plan Generated Successfully
                       </p>
                       <p style={{ fontSize: '0.95rem', opacity: 0.7, marginTop: '10px' }}>
-                        {formData.plotWidth}m × {formData.plotHeight}m | {formData.numRooms} Rooms
+                        {formData.width} ft × {formData.depth} ft | {formData.bedrooms} Bedrooms | {formData.toilet} Toilets
                       </p>
                       <p style={{ fontSize: '0.9rem', opacity: 0.6, marginTop: '20px' }}>
                         (Backend integration required to display actual floor plan)
