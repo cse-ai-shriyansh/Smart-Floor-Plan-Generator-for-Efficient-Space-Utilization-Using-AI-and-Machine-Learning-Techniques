@@ -14,7 +14,7 @@ type ResponseData = {
  * 
  * Expected Request Body:
  * {
- *   length: number,
+ *   depth: number,
  *   width: number,
  *   bedrooms: number,
  *   drawingRoom: number,
@@ -24,10 +24,7 @@ type ResponseData = {
  *   parkingLength?: number,
  *   parkingWidth?: number,
  *   parkingDepth?: number,
- *   hasPorch: boolean,
- *   porch?: number,
- *   hasVeranda: boolean,
- *   veranda?: number
+ *   porchVeranda?: number
  * }
  */
 export default async function handler(
@@ -45,7 +42,7 @@ export default async function handler(
 
   try {
     const {
-      length,
+      depth,
       width,
       bedrooms,
       drawingRoom,
@@ -55,14 +52,11 @@ export default async function handler(
       parkingLength,
       parkingWidth,
       parkingDepth,
-      hasPorch,
-      porch,
-      hasVeranda,
-      veranda
+      porchVeranda
     } = req.body;
 
     // Validation
-    if (!length || !width || bedrooms === undefined || drawingRoom === undefined || 
+    if (!depth || !width || bedrooms === undefined || drawingRoom === undefined || 
         kitchen === undefined || !toilet) {
       return res.status(400).json({
         success: false,
@@ -72,7 +66,7 @@ export default async function handler(
     }
 
     // Validate numerical constraints
-    if (parseFloat(length) <= 0 || parseFloat(width) <= 0) {
+    if (parseFloat(depth) <= 0 || parseFloat(width) <= 0) {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -101,24 +95,6 @@ export default async function handler(
       }
     }
 
-    // Validate porch if enabled
-    if (hasPorch && (!porch || parseInt(porch) < 1)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        error: 'Number of porches must be at least 1'
-      });
-    }
-
-    // Validate veranda if enabled
-    if (hasVeranda && (!veranda || parseInt(veranda) < 1)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        error: 'Number of verandas must be at least 1'
-      });
-    }
-
     // TODO: Implement actual floor plan generation logic
     // - Call ML model API
     // - Process input parameters
@@ -137,7 +113,7 @@ export default async function handler(
         floorPlanId: 'fp_' + Date.now(),
         imageUrl: '/floor-plans/generated_' + Date.now() + '.png',
         parameters: {
-          length,
+          depth,
           width,
           bedrooms,
           drawingRoom,
@@ -148,10 +124,7 @@ export default async function handler(
             parkingLength,
             parkingWidth,
             parkingDepth,
-            hasPorch,
-            porch,
-            hasVeranda,
-            veranda
+            porchVeranda
           }
         },
         generatedAt: new Date().toISOString()

@@ -3,7 +3,7 @@ import Head from 'next/head';
 import styles from '@/styles/App.module.css';
 
 interface FormData {
-  length: string;
+  depth: string;
   width: string;
   bedrooms: string;
   drawingRoom: string;
@@ -13,15 +13,12 @@ interface FormData {
   parkingLength: string;
   parkingWidth: string;
   parkingDepth: string;
-  hasPorch: boolean;
-  porch: string;
-  hasVeranda: boolean;
-  veranda: string;
+  porchVeranda: string;
 }
 
 export default function App() {
   const [formData, setFormData] = useState<FormData>({
-    length: '',
+    depth: '',
     width: '',
     bedrooms: '',
     drawingRoom: '',
@@ -31,10 +28,7 @@ export default function App() {
     parkingLength: '',
     parkingWidth: '',
     parkingDepth: '',
-    hasPorch: false,
-    porch: '',
-    hasVeranda: false,
-    veranda: '',
+    porchVeranda: '',
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -71,11 +65,11 @@ export default function App() {
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
 
-    // Length validation
-    if (!formData.length) {
-      newErrors.length = 'Length is required';
-    } else if (parseFloat(formData.length) <= 0) {
-      newErrors.length = 'Length must be greater than 0';
+    // Depth validation
+    if (!formData.depth) {
+      newErrors.depth = 'Depth is required';
+    } else if (parseFloat(formData.depth) <= 0) {
+      newErrors.depth = 'Depth must be greater than 0';
     }
 
     // Width validation
@@ -126,20 +120,6 @@ export default function App() {
       }
     }
 
-    // Porch validation (if enabled)
-    if (formData.hasPorch) {
-      if (!formData.porch || parseInt(formData.porch) < 1) {
-        newErrors.porch = 'Number of porches must be at least 1';
-      }
-    }
-
-    // Veranda validation (if enabled)
-    if (formData.hasVeranda) {
-      if (!formData.veranda || parseInt(formData.veranda) < 1) {
-        newErrors.veranda = 'Number of verandas must be at least 1';
-      }
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -180,7 +160,7 @@ export default function App() {
 
   const handleReset = () => {
     setFormData({
-      length: '',
+      depth: '',
       width: '',
       bedrooms: '',
       drawingRoom: '',
@@ -190,10 +170,7 @@ export default function App() {
       parkingLength: '',
       parkingWidth: '',
       parkingDepth: '',
-      hasPorch: false,
-      porch: '',
-      hasVeranda: false,
-      veranda: '',
+      porchVeranda: '',
     });
     setErrors({});
     setFloorPlan(null);
@@ -232,16 +209,16 @@ export default function App() {
                   <div>
                     <input
                       type="number"
-                      name="length"
+                      name="depth"
                       className={styles.input}
-                      placeholder="Length"
-                      value={formData.length}
+                      placeholder="Depth"
+                      value={formData.depth}
                       onChange={handleChange}
                       step="0.1"
                       min="0"
                     />
-                    {errors.length && (
-                      <div className={styles.errorMessage}>{errors.length}</div>
+                    {errors.depth && (
+                      <div className={styles.errorMessage}>{errors.depth}</div>
                     )}
                   </div>
                   <div>
@@ -260,7 +237,7 @@ export default function App() {
                     )}
                   </div>
                 </div>
-                <p className={styles.helpText}>Enter length and width of your plot in feet</p>
+                <p className={styles.helpText}>Enter depth and width of your plot in feet</p>
               </div>
 
               {/* Room Specifications */}
@@ -395,72 +372,19 @@ export default function App() {
                 )}
               </div>
 
-              {/* Porch (Optional) */}
+              {/* Porch / Veranda (Optional) */}
               <div className={styles.formGroup}>
-                <div className={styles.checkboxGroup}>
-                  <input
-                    type="checkbox"
-                    id="hasPorch"
-                    name="hasPorch"
-                    className={styles.checkbox}
-                    checked={formData.hasPorch}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="hasPorch" className={styles.checkboxLabel}>
-                    Include Porch
-                  </label>
-                </div>
-                
-                {formData.hasPorch && (
-                  <div style={{ marginTop: '15px' }}>
-                    <input
-                      type="number"
-                      name="porch"
-                      className={styles.input}
-                      placeholder="Number of Porches"
-                      value={formData.porch}
-                      onChange={handleChange}
-                      min="1"
-                    />
-                    {errors.porch && (
-                      <div className={styles.errorMessage}>{errors.porch}</div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Veranda (Optional) */}
-              <div className={styles.formGroup}>
-                <div className={styles.checkboxGroup}>
-                  <input
-                    type="checkbox"
-                    id="hasVeranda"
-                    name="hasVeranda"
-                    className={styles.checkbox}
-                    checked={formData.hasVeranda}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="hasVeranda" className={styles.checkboxLabel}>
-                    Include Veranda
-                  </label>
-                </div>
-                
-                {formData.hasVeranda && (
-                  <div style={{ marginTop: '15px' }}>
-                    <input
-                      type="number"
-                      name="veranda"
-                      className={styles.input}
-                      placeholder="Number of Verandas"
-                      value={formData.veranda}
-                      onChange={handleChange}
-                      min="1"
-                    />
-                    {errors.veranda && (
-                      <div className={styles.errorMessage}>{errors.veranda}</div>
-                    )}
-                  </div>
-                )}
+                <label className={styles.label}>Porch / Veranda (Optional)</label>
+                <input
+                  type="number"
+                  name="porchVeranda"
+                  className={styles.input}
+                  placeholder="Number of Porch / Veranda"
+                  value={formData.porchVeranda}
+                  onChange={handleChange}
+                  min="0"
+                />
+                <p className={styles.helpText}>Enter total number of porch or veranda spaces</p>
               </div>
 
               {/* Buttons */}
@@ -486,7 +410,7 @@ export default function App() {
 
           {/* Right Panel - Preview */}
           <div className={styles.rightPanel}>
-            <h2 className={styles.previewTitle}>Floor Plan Preview</h2>
+            <h2 className={styles.previewTitle}>Generated Floor Plan</h2>
             
             <div className={styles.previewContent}>
               {!isLoading && !floorPlan && !generationError && (
@@ -530,7 +454,7 @@ export default function App() {
                         Floor Plan Generated Successfully
                       </p>
                       <p style={{ fontSize: '0.95rem', opacity: 0.7, marginTop: '10px' }}>
-                        {formData.length}ft × {formData.width}ft | {formData.bedrooms} Bedrooms
+                        {formData.depth}ft × {formData.width}ft | {formData.bedrooms} Bedrooms
                       </p>
                       <p style={{ fontSize: '0.9rem', opacity: 0.6, marginTop: '20px' }}>
                         (Backend integration required to display actual floor plan)
