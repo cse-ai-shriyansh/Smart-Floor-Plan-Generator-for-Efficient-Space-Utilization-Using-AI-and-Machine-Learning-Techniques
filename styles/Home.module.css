@@ -24,7 +24,7 @@
 }
 
 .logoContainer img {
-  filter: grayscale(100%) contrast(100%);
+  /* Display SVG in full color */
 }
 
 .heroTagline {
