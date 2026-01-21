@@ -37,12 +37,12 @@ export default function Tutorial() {
               <div className={styles.iconBox}>□</div>
               <h2 className={styles.stepTitle}>Input Plot Dimensions</h2>
               <p className={styles.stepDescription}>
-                Start by entering the dimensions of your plot. Specify the width and height in your preferred unit (meters or feet).
+                Start by entering the dimensions of your plot. Specify the width and height in Feet.
               </p>
               <div className={styles.stepDetails}>
                 <ul>
-                  <li>Enter plot width (e.g., 30 meters)</li>
-                  <li>Enter plot height (e.g., 40 meters)</li>
+                  <li>Enter plot width (e.g., 30 feet)</li>
+                  <li>Enter plot depth (e.g., 40 feet)</li>
                   <li>Ensure measurements are accurate for best results</li>
                   <li>Both dimensions must be positive numbers</li>
                 </ul>
@@ -61,10 +61,11 @@ export default function Tutorial() {
               </p>
               <div className={styles.stepDetails}>
                 <ul>
-                  <li>Select total number of rooms (1-10)</li>
-                  <li>Specify room types (bedroom, bathroom, kitchen, etc.)</li>
-                  <li>Add special requirements or preferences</li>
-                  <li>Consider space allocation for each room type</li>
+                  <li>Specify number of bedrooms (e.g., 3)</li>
+                  <li>Specify number of living rooms (e.g., 1)</li>
+                  <li>Specify number of kitchen</li>
+                  <li>specify number of toilets</li>
+                  <li> Additional requirements (Parking area, Poarch)</li>
                 </ul>
               </div>
             </div>
