@@ -3,27 +3,37 @@ import Head from 'next/head';
 import styles from '@/styles/App.module.css';
 
 interface FormData {
+  length: string;
   width: string;
-  depth: string;
   bedrooms: string;
   drawingRoom: string;
   kitchen: string;
   toilet: string;
-  parking: string;
+  hasParking: boolean;
+  parkingLength: string;
+  parkingWidth: string;
+  parkingDepth: string;
+  hasPorch: boolean;
   porch: string;
+  hasVeranda: boolean;
   veranda: string;
 }
 
 export default function App() {
   const [formData, setFormData] = useState<FormData>({
+    length: '',
     width: '',
-    depth: '',
     bedrooms: '',
     drawingRoom: '',
     kitchen: '',
     toilet: '',
-    parking: '',
+    hasParking: false,
+    parkingLength: '',
+    parkingWidth: '',
+    parkingDepth: '',
+    hasPorch: false,
     porch: '',
+    hasVeranda: false,
     veranda: '',
   });
 
@@ -61,18 +71,18 @@ export default function App() {
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
 
+    // Length validation
+    if (!formData.length) {
+      newErrors.length = 'Length is required';
+    } else if (parseFloat(formData.length) <= 0) {
+      newErrors.length = 'Length must be greater than 0';
+    }
+
     // Width validation
     if (!formData.width) {
       newErrors.width = 'Width is required';
     } else if (parseFloat(formData.width) <= 0) {
       newErrors.width = 'Width must be greater than 0';
-    }
-
-    // Depth validation
-    if (!formData.depth) {
-      newErrors.depth = 'Depth is required';
-    } else if (parseFloat(formData.depth) <= 0) {
-      newErrors.depth = 'Depth must be greater than 0';
     }
 
     // Bedrooms validation
@@ -101,6 +111,33 @@ export default function App() {
       newErrors.toilet = 'Number of toilets is required';
     } else if (parseInt(formData.toilet) < 1) {
       newErrors.toilet = 'At least one toilet is required';
+    }
+
+    // Parking validation (if enabled)
+    if (formData.hasParking) {
+      if (!formData.parkingLength || parseFloat(formData.parkingLength) <= 0) {
+        newErrors.parkingLength = 'Parking length must be greater than 0';
+      }
+      if (!formData.parkingWidth || parseFloat(formData.parkingWidth) <= 0) {
+        newErrors.parkingWidth = 'Parking width must be greater than 0';
+      }
+      if (!formData.parkingDepth || parseFloat(formData.parkingDepth) <= 0) {
+        newErrors.parkingDepth = 'Parking depth must be greater than 0';
+      }
+    }
+
+    // Porch validation (if enabled)
+    if (formData.hasPorch) {
+      if (!formData.porch || parseInt(formData.porch) < 1) {
+        newErrors.porch = 'Number of porches must be at least 1';
+      }
+    }
+
+    // Veranda validation (if enabled)
+    if (formData.hasVeranda) {
+      if (!formData.veranda || parseInt(formData.veranda) < 1) {
+        newErrors.veranda = 'Number of verandas must be at least 1';
+      }
     }
 
     setErrors(newErrors);
@@ -143,14 +180,19 @@ export default function App() {
 
   const handleReset = () => {
     setFormData({
+      length: '',
       width: '',
-      depth: '',
       bedrooms: '',
       drawingRoom: '',
       kitchen: '',
       toilet: '',
-      parking: '',
+      hasParking: false,
+      parkingLength: '',
+      parkingWidth: '',
+      parkingDepth: '',
+      hasPorch: false,
       porch: '',
+      hasVeranda: false,
       veranda: '',
     });
     setErrors({});
@@ -190,6 +232,21 @@ export default function App() {
                   <div>
                     <input
                       type="number"
+                      name="length"
+                      className={styles.input}
+                      placeholder="Length"
+                      value={formData.length}
+                      onChange={handleChange}
+                      step="0.1"
+                      min="0"
+                    />
+                    {errors.length && (
+                      <div className={styles.errorMessage}>{errors.length}</div>
+                    )}
+                  </div>
+                  <div>
+                    <input
+                      type="number"
                       name="width"
                       className={styles.input}
                       placeholder="Width"
@@ -202,23 +259,8 @@ export default function App() {
                       <div className={styles.errorMessage}>{errors.width}</div>
                     )}
                   </div>
-                  <div>
-                    <input
-                      type="number"
-                      name="depth"
-                      className={styles.input}
-                      placeholder="Depth"
-                      value={formData.depth}
-                      onChange={handleChange}
-                      step="0.1"
-                      min="0"
-                    />
-                    {errors.depth && (
-                      <div className={styles.errorMessage}>{errors.depth}</div>
-                    )}
-                  </div>
                 </div>
-                <p className={styles.helpText}>Enter width and depth of your plot in feet</p>
+                <p className={styles.helpText}>Enter length and width of your plot in feet</p>
               </div>
 
               {/* Room Specifications */}
@@ -286,44 +328,139 @@ export default function App() {
                 )}
               </div>
 
-              {/* Additional Spaces */}
+              {/* Parking Space (Optional) */}
               <div className={styles.formGroup}>
-                <label className={styles.label}>Additional Spaces (Optional)</label>
-                <div className={styles.inputGroup}>
-                  <div>
-                    <input
-                      type="number"
-                      name="parking"
-                      className={styles.input}
-                      placeholder="Parking"
-                      value={formData.parking}
-                      onChange={handleChange}
-                      min="0"
-                    />
+                <div className={styles.checkboxGroup}>
+                  <input
+                    type="checkbox"
+                    id="hasParking"
+                    name="hasParking"
+                    className={styles.checkbox}
+                    checked={formData.hasParking}
+                    onChange={handleChange}
+                  />
+                  <label htmlFor="hasParking" className={styles.checkboxLabel}>
+                    Include Parking Space
+                  </label>
+                </div>
+                
+                {formData.hasParking && (
+                  <div className={styles.inputGroup} style={{ marginTop: '15px' }}>
+                    <div>
+                      <input
+                        type="number"
+                        name="parkingLength"
+                        className={styles.input}
+                        placeholder="Length (ft)"
+                        value={formData.parkingLength}
+                        onChange={handleChange}
+                        step="0.1"
+                        min="0"
+                      />
+                      {errors.parkingLength && (
+                        <div className={styles.errorMessage}>{errors.parkingLength}</div>
+                      )}
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        name="parkingWidth"
+                        className={styles.input}
+                        placeholder="Width (ft)"
+                        value={formData.parkingWidth}
+                        onChange={handleChange}
+                        step="0.1"
+                        min="0"
+                      />
+                      {errors.parkingWidth && (
+                        <div className={styles.errorMessage}>{errors.parkingWidth}</div>
+                      )}
+                    </div>
+                    <div>
+                      <input
+                        type="number"
+                        name="parkingDepth"
+                        className={styles.input}
+                        placeholder="Depth (ft)"
+                        value={formData.parkingDepth}
+                        onChange={handleChange}
+                        step="0.1"
+                        min="0"
+                      />
+                      {errors.parkingDepth && (
+                        <div className={styles.errorMessage}>{errors.parkingDepth}</div>
+                      )}
+                    </div>
                   </div>
-                  <div>
+                )}
+              </div>
+
+              {/* Porch (Optional) */}
+              <div className={styles.formGroup}>
+                <div className={styles.checkboxGroup}>
+                  <input
+                    type="checkbox"
+                    id="hasPorch"
+                    name="hasPorch"
+                    className={styles.checkbox}
+                    checked={formData.hasPorch}
+                    onChange={handleChange}
+                  />
+                  <label htmlFor="hasPorch" className={styles.checkboxLabel}>
+                    Include Porch
+                  </label>
+                </div>
+                
+                {formData.hasPorch && (
+                  <div style={{ marginTop: '15px' }}>
                     <input
                       type="number"
                       name="porch"
                       className={styles.input}
-                      placeholder="Porch"
+                      placeholder="Number of Porches"
                       value={formData.porch}
                       onChange={handleChange}
-                      min="0"
+                      min="1"
                     />
+                    {errors.porch && (
+                      <div className={styles.errorMessage}>{errors.porch}</div>
+                    )}
                   </div>
+                )}
+              </div>
+
+              {/* Veranda (Optional) */}
+              <div className={styles.formGroup}>
+                <div className={styles.checkboxGroup}>
+                  <input
+                    type="checkbox"
+                    id="hasVeranda"
+                    name="hasVeranda"
+                    className={styles.checkbox}
+                    checked={formData.hasVeranda}
+                    onChange={handleChange}
+                  />
+                  <label htmlFor="hasVeranda" className={styles.checkboxLabel}>
+                    Include Veranda
+                  </label>
                 </div>
-                <input
-                  type="number"
-                  name="veranda"
-                  className={styles.input}
-                  placeholder="Veranda"
-                  value={formData.veranda}
-                  onChange={handleChange}
-                  min="0"
-                  style={{ marginTop: '15px' }}
-                />
-                <p className={styles.helpText}>Add parking, porch, or veranda spaces</p>
+                
+                {formData.hasVeranda && (
+                  <div style={{ marginTop: '15px' }}>
+                    <input
+                      type="number"
+                      name="veranda"
+                      className={styles.input}
+                      placeholder="Number of Verandas"
+                      value={formData.veranda}
+                      onChange={handleChange}
+                      min="1"
+                    />
+                    {errors.veranda && (
+                      <div className={styles.errorMessage}>{errors.veranda}</div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Buttons */}
@@ -393,7 +530,7 @@ export default function App() {
                         Floor Plan Generated Successfully
                       </p>
                       <p style={{ fontSize: '0.95rem', opacity: 0.7, marginTop: '10px' }}>
-                        {formData.width} ft × {formData.depth} ft | {formData.bedrooms} Bedrooms | {formData.toilet} Toilets
+                        {formData.length}ft × {formData.width}ft | {formData.bedrooms} Bedrooms
                       </p>
                       <p style={{ fontSize: '0.9rem', opacity: 0.6, marginTop: '20px' }}>
                         (Backend integration required to display actual floor plan)

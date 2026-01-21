@@ -14,15 +14,20 @@ type ResponseData = {
  * 
  * Expected Request Body:
  * {
- *   plotWidth: number,
- *   plotHeight: number,
- *   numRooms: number,
+ *   length: number,
+ *   width: number,
  *   bedrooms: number,
- *   bathrooms: number,
- *   kitchen: boolean,
- *   livingRoom: boolean,
- *   diningRoom: boolean,
- *   studyRoom: boolean
+ *   drawingRoom: number,
+ *   kitchen: number,
+ *   toilet: number,
+ *   hasParking: boolean,
+ *   parkingLength?: number,
+ *   parkingWidth?: number,
+ *   parkingDepth?: number,
+ *   hasPorch: boolean,
+ *   porch?: number,
+ *   hasVeranda: boolean,
+ *   veranda?: number
  * }
  */
 export default async function handler(
@@ -40,19 +45,25 @@ export default async function handler(
 
   try {
     const {
-      plotWidth,
-      plotHeight,
-      numRooms,
+      length,
+      width,
       bedrooms,
-      bathrooms,
+      drawingRoom,
       kitchen,
-      livingRoom,
-      diningRoom,
-      studyRoom
+      toilet,
+      hasParking,
+      parkingLength,
+      parkingWidth,
+      parkingDepth,
+      hasPorch,
+      porch,
+      hasVeranda,
+      veranda
     } = req.body;
 
     // Validation
-    if (!plotWidth || !plotHeight || !numRooms || bedrooms === undefined || !bathrooms) {
+    if (!length || !width || bedrooms === undefined || drawingRoom === undefined || 
+        kitchen === undefined || !toilet) {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -61,7 +72,7 @@ export default async function handler(
     }
 
     // Validate numerical constraints
-    if (plotWidth <= 0 || plotHeight <= 0) {
+    if (parseFloat(length) <= 0 || parseFloat(width) <= 0) {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
@@ -69,11 +80,42 @@ export default async function handler(
       });
     }
 
-    if (numRooms < 1 || numRooms > 10) {
+    if (parseInt(toilet) < 1) {
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
-        error: 'Number of rooms must be between 1 and 10'
+        error: 'At least one toilet is required'
+      });
+    }
+
+    // Validate parking dimensions if parking is enabled
+    if (hasParking) {
+      if (!parkingLength || !parkingWidth || !parkingDepth ||
+          parseFloat(parkingLength) <= 0 || parseFloat(parkingWidth) <= 0 || 
+          parseFloat(parkingDepth) <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          error: 'Parking dimensions must be provided and greater than 0'
+        });
+      }
+    }
+
+    // Validate porch if enabled
+    if (hasPorch && (!porch || parseInt(porch) < 1)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        error: 'Number of porches must be at least 1'
+      });
+    }
+
+    // Validate veranda if enabled
+    if (hasVeranda && (!veranda || parseInt(veranda) < 1)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        error: 'Number of verandas must be at least 1'
       });
     }
 
@@ -95,16 +137,21 @@ export default async function handler(
         floorPlanId: 'fp_' + Date.now(),
         imageUrl: '/floor-plans/generated_' + Date.now() + '.png',
         parameters: {
-          plotWidth,
-          plotHeight,
-          numRooms,
+          length,
+          width,
           bedrooms,
-          bathrooms,
-          additionalRooms: {
-            kitchen,
-            livingRoom,
-            diningRoom,
-            studyRoom
+          drawingRoom,
+          kitchen,
+          toilet,
+          additionalSpaces: {
+            hasParking,
+            parkingLength,
+            parkingWidth,
+            parkingDepth,
+            hasPorch,
+            porch,
+            hasVeranda,
+            veranda
           }
         },
         generatedAt: new Date().toISOString()
