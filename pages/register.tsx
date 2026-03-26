@@ -93,25 +93,33 @@ export default function Register() {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call
-      // const response = await fetch('/api/register', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
+      // Call backend API
+      const response = await fetch('http://localhost:8000/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
 
-      // Simulate successful registration
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Registration failed');
+      }
+
+      const data = await response.json();
       
-      setSuccessMessage('Registration successful! Redirecting to tutorial...');
-      
-      // Navigate to tutorial page after 1.5 seconds
-      setTimeout(() => {
-        router.push('/tutorial');
-      }, 1500);
+      if (data.success) {
+        setSuccessMessage('Registration successful! Redirecting to tutorial...');
+        
+        // Navigate to tutorial page after 1.5 seconds
+        setTimeout(() => {
+          router.push('/tutorial');
+        }, 1500);
+      } else {
+        setErrors({ email: data.error || 'Registration failed' });
+      }
 
     } catch (error) {
-      setErrors({ email: 'Registration failed. Please try again.' });
+      setErrors({ email: error instanceof Error ? error.message : 'Registration failed. Please try again.' });
     } finally {
       setIsSubmitting(false);
     }

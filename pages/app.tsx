@@ -136,22 +136,49 @@ export default function App() {
     setFloorPlan(null);
 
     try {
-      // Simulate API call to generate floor plan
-      // const response = await fetch('/api/generate-floorplan', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
+      // Call backend API
+      const response = await fetch('http://localhost:8000/generate-plan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plotDimensions: {
+            length: parseFloat(formData.depth),
+            width: parseFloat(formData.width)
+          },
+          depth: parseFloat(formData.depth),
+          width: parseFloat(formData.width),
+          bedrooms: parseInt(formData.bedrooms),
+          livingRooms: parseInt(formData.drawingRoom),
+          kitchens: parseInt(formData.kitchen),
+          toilets: parseInt(formData.toilet),
+          parking: {
+            enabled: formData.hasParking,
+            length: formData.hasParking ? parseFloat(formData.parkingLength) : null,
+            width: formData.hasParking ? parseFloat(formData.parkingWidth) : null,
+            depth: formData.hasParking ? parseFloat(formData.parkingDepth) : null
+          },
+          porch: {
+            enabled: parseInt(formData.porchVeranda) > 0,
+            count: parseInt(formData.porchVeranda) || 0
+          }
+        })
+      });
 
-      // Simulate generation delay
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to generate floor plan');
+      }
 
-      // Simulate successful generation
-      // In production, this would be the actual floor plan image URL
-      setFloorPlan('/placeholder-floor-plan.png');
+      const data = await response.json();
+      
+      if (data.success) {
+        setFloorPlan(data.imageUrl);
+      } else {
+        setGenerationError(data.error || 'Failed to generate floor plan');
+      }
       
     } catch (error) {
-      setGenerationError('Failed to generate floor plan. Please check your inputs and try again.');
+      setGenerationError(error instanceof Error ? error.message : 'Failed to generate floor plan. Please try again.');
       console.error('Generation error:', error);
     } finally {
       setIsLoading(false);
