@@ -76,16 +76,37 @@ The Smart Floor Plan Generator is a fully responsive, minimalist website designe
 
 ## 🏛️ Architecture
 
-### Frontend
-- **React Hooks**: useState, useRouter for state management and navigation
-- **Form Validation**: Real-time client-side validation
-- **Responsive Design**: CSS Grid and Flexbox layouts
-- **API Integration**: RESTful API calls with fetch
+### Frontend Architecture
+- **Pages Router (Next.js + TypeScript)**: UI pages are implemented in `pages/` and composed with reusable layout components in `components/`.
+- **State + Validation**: `pages/app.tsx` handles form state, conditional field logic (parking/porch), and client-side validation before submit.
+- **API Boundary**: Browser requests are sent to Next.js API routes (same-origin), not directly to Python backend.
+- **Resilience Controls**: Loading states, user-friendly error messages, and retry-friendly behavior are built into the generation flow.
 
-### Backend (API Routes)
-- Next.js API routes for serverless functions
-- Input validation and error handling
-- Simulated AI processing (ready for ML model integration)
+### Backend Architecture And Services
+- **Next.js API Layer (`pages/api/`)**:
+   - `generate-floorplan.ts` normalizes legacy and new payload formats.
+   - Enforces per-route rate limit (`5 requests / 5 minutes` at this route).
+   - Proxies valid requests to FastAPI `/generate-plan` via `lib/api.ts`.
+- **FastAPI Service (`backend/main.py`)**:
+   - Pydantic validation using nested request models (`backend/models.py`).
+   - In-memory IP/path rate-limiting middleware.
+   - Runtime switching between remote Colab generation and local fallback generation.
+- **Colab Integration Service (`backend/services/colab_service.py`)**:
+   - Health-checks remote Colab endpoint before inference call.
+   - Uses proxy-safe timeout handling and tunnel-expiry error messages.
+- **Local Generator (`backend/image_generator.py`)**:
+   - Generates a base64 PNG floor plan (matplotlib) when remote mode is disabled or fallback is enabled.
+
+### Full Stack Workflow
+End-to-end request path for floor plan generation:
+
+1. **Browser** submits floor-plan requirements from `/app`.
+2. **Next.js API route** (`POST /api/generate-floorplan`) validates and normalizes payload.
+3. **FastAPI backend** (`POST /generate-plan`) performs strict schema validation and runtime routing.
+4. **AI generator** runs in either remote Colab mode or local fallback mode.
+5. **Response image** returns as a data URL (`imageUrl`) to the browser for preview + download.
+
+Flow summary: `Browser -> Next.js API routes -> FastAPI backend -> AI generator -> response image`.
 
 ### Design System
 - **Color Variables**: CSS custom properties for theming
@@ -274,24 +295,8 @@ Generate AI-powered floor plan
   "success": true,
   "message": "Floor plan generated successfully",
   "data": {
-    "floorPlanId": "fp_123456789",
-    "imageUrl": "/floor-plans/generated_123456789.png",
-    "parameters": {
-      "depth": 40,
-      "width": 30,
-      "bedrooms": 3,
-      "drawingRoom": 1,
-      "kitchen": 1,
-      "toilet": 2,
-      "additionalSpaces": {
-        "hasParking": true,
-        "parkingLength": 20,
-        "parkingWidth": 10,
-        "parkingDepth": 15,
-        "porchVeranda": 1
-      }
-    },
-    "generatedAt": "2026-01-22T10:00:00Z"
+      "imageUrl": "data:image/png;base64,...",
+      "generatedAt": "2026-04-24T10:00:00.000Z"
   }
 }
 ```
@@ -361,52 +366,61 @@ Track tutorial completion status
 - Building code compliance checking
 - Construction planning support
 
-## 🔬 Deep Learning Integration (Future)
+## 🧠 AI Image Generation
 
-This application is designed to integrate with deep learning models for:
-- **Space Optimization**: ML algorithms for efficient room placement
-- **Style Learning**: Train on architectural styles and preferences
-- **Constraint Satisfaction**: AI-driven layout that meets building codes
-- **Multi-objective Optimization**: Balance cost, aesthetics, and functionality
+### Remote mode (Colab service)
+- Enable `USE_COLAB_API=true` in backend environment.
+- Set `COLAB_API_URL` to the active Colab tunnel base URL.
+- Backend performs `GET /health` on Colab first, then submits `POST /generate`.
+- On success, backend maps remote `image_url` to frontend-facing `imageUrl`.
 
-### Planned ML Features
-- Generative Adversarial Networks (GANs) for floor plan generation
-- Reinforcement Learning for layout optimization
-- Computer Vision for style transfer
-- Natural Language Processing for user requirement interpretation
+### Local fallback mode
+- If `USE_COLAB_API=false`, backend always generates locally with matplotlib.
+- If `USE_COLAB_API=true` and `FALLBACK_TO_LOCAL_ON_COLAB_ERROR=true`, backend auto-falls back when remote generation fails.
+- This keeps UX stable during tunnel outages and model warm-up delays.
 
-## 🎯 Backend Integration Guide
+### Timeout and tunnel reliability notes
+- Colab tunnel URLs can expire; backend returns explicit instructions when tunnel reachability fails.
+- Proxy-safe timeout logic avoids long-hanging requests (especially with temporary tunnels).
+- For slow inference, prefer GPU runtimes and lower inference steps to reduce timeout risk.
 
-To integrate with your backend:
+## 🗺️ Fine-Tuning Roadmap
 
-1. **Update API endpoints** in the page components:
-   - Uncomment the `fetch` calls in `register.tsx`, `app.tsx`
-   - Replace placeholder API URLs with your actual backend URLs
+### 1. Dataset preparation
+- Build paired training examples: **input JSON constraints + target floor plan images**.
+- Include realistic diversity across plot sizes, room counts, parking/porch variants, and regional layout styles.
+- Add quality tags (constraint-valid, circulation quality, readability) for downstream filtering.
 
-2. **Implement authentication**:
-   - Add JWT token handling
-   - Implement secure cookie management
-   - Add protected route middleware
+### 2. LoRA-first, then full fine-tuning
+- Start with **LoRA adapters** to reduce compute cost and shorten iteration cycle.
+- Promote to full-model fine-tuning only if LoRA saturates on key quality metrics.
+- Keep a frozen baseline checkpoint for regression comparisons.
 
-3. **Connect Deep Learning Model**:
-   - Update `/api/generate-floorplan` to call your ML model
-   - Handle image generation and storage
-   - Implement result caching if needed
+### 3. Validation metrics
+- **Constraint adherence**: percentage of generations matching requested counts/dimensions.
+- **Layout quality**: room adjacency, circulation logic, and usable area distribution.
+- **Visual clarity**: line readability, label legibility, overlap/artifact rate.
 
-4. **Database Integration**:
-   - Connect user registration to database
-   - Store floor plan generation history
-   - Implement user sessions
+### 4. Inference parameter tuning
+- Tune step count, guidance scale, sampler choice, and output resolution for latency/quality balance.
+- Track p50/p95 generation latency and failed-generation rate.
+- Version parameter presets (fast/standard/high-quality) for predictable production behavior.
 
-## 🔒 Security Considerations
+## 🏭 Production Recommendations
 
-- Implement proper password hashing (bcrypt)
-- Add CSRF protection
-- Implement rate limiting
-- Sanitize user inputs
-- Use HTTPS in production
-- Implement JWT token expiration
-- Add SQL injection prevention
+- Run Next.js and FastAPI as separate services with health checks and restart policies.
+- Configure strict `CORS_ORIGINS` in production (avoid wildcard origins).
+- Move from in-memory rate limiting to a shared store (Redis) for multi-instance deployments.
+- Add observability: structured logs, request IDs, and latency/error dashboards.
+- Cache deterministic or repeated requests where feasible to reduce AI compute spikes.
+
+## 🔒 Security Notes
+
+- Keep all secrets (API keys, tokens, tunnel credentials) in environment variables only.
+- Do not commit `.env` files or expose internal backend URLs to untrusted clients.
+- Keep HTTPS enabled end-to-end and sanitize all user-controlled numeric inputs.
+- Add authentication/authorization before exposing generation endpoints publicly.
+- Rotate credentials regularly and apply least-privilege access to infrastructure.
 
 ## 📱 Browser Support
 
@@ -454,14 +468,14 @@ Contributions are welcome! To contribute:
 
 ## 🐛 Known Issues & Limitations
 
-- ML model integration is placeholder (requires backend)
-- Floor plan generation is simulated (no actual AI processing)
-- Image download requires backend storage implementation
-- User authentication is basic (needs production security)
+- Colab tunnel URLs can expire and require periodic refresh in backend environment.
+- Local fallback output is deterministic and simpler than advanced diffusion-based outputs.
+- In-memory rate limiting resets on backend restart and is not shared across instances.
+- User authentication flow is still basic and should be hardened before public launch.
 
 ## 📋 Future Roadmap
 
-- [ ] Integrate actual deep learning model
+- [ ] Improve remote model quality with staged LoRA training
 - [ ] Add user authentication with JWT
 - [ ] Implement database for user history
 - [ ] Add floor plan editing capabilities
